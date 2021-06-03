@@ -2,18 +2,25 @@ package com.kla.flappybird
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.Circle
+import com.badlogic.gdx.math.Intersector
+import com.badlogic.gdx.math.Rectangle
 import java.util.*
 
 class FlappyBird : ApplicationAdapter() {
     var batch: SpriteBatch? = null
     var background: Texture? = null
+//    var shapeRenderer: ShapeRenderer? = null
 
     var birds = arrayOfNulls<Texture?>(2)
     var flapState = 0
     var birdY = 0f
     var velocity = 0
+    var birdPeri: Circle? = null
 
     var gameState = 0
     var gravity = 2
@@ -28,10 +35,15 @@ class FlappyBird : ApplicationAdapter() {
     var tubeX = arrayOfNulls<Float>(numberOfTube)
     var tubeOffset = arrayOfNulls<Float>(numberOfTube)
     var distanceBetweenTubes = 0
+    var topTubeRect = arrayOfNulls<Rectangle>(numberOfTube)
+    var bottomTubeRect = arrayOfNulls<Rectangle>(numberOfTube)
+
 
     override fun create() {
         batch = SpriteBatch()
         background = Texture("bg.png")
+//        shapeRenderer = ShapeRenderer()
+        birdPeri = Circle()
 
 //        birds = arrayOfNulls<Texture>(2)
         birds[0] = Texture("bird.png")
@@ -42,10 +54,12 @@ class FlappyBird : ApplicationAdapter() {
         bottomTube = Texture("bottomtube.png")
         maxTubeOffset = Gdx.graphics.height / 2 - gap
         distanceBetweenTubes = Gdx.graphics.width * 3/5
-
+        
         for (i in 0 until numberOfTube) {
         tubeOffset[i] = (random.nextFloat() - 0.5f) * (Gdx.graphics.height - gap - 200)
-        tubeX[i] = Gdx.graphics.width / 2 - topTube!!.width.toFloat() / 2 + i * distanceBetweenTubes
+        tubeX[i] = Gdx.graphics.width / 2 - topTube!!.width.toFloat() / 2 + Gdx.graphics.width + i * distanceBetweenTubes
+        topTubeRect[i] = Rectangle()
+        bottomTubeRect[i] = Rectangle()
         }
     }
 
@@ -63,6 +77,7 @@ class FlappyBird : ApplicationAdapter() {
             for (i in 0 until numberOfTube) {
                 if (tubeX[i]!! < - topTube!!.width) {
                     tubeX[i] = tubeX[i]!! + numberOfTube * distanceBetweenTubes
+                    tubeOffset[i] = (random.nextFloat() - 0.5f) * (Gdx.graphics.height - gap - 200)
 
                 } else {
                     tubeX[i] = tubeX[i]!! - tubeVelocity
@@ -72,6 +87,12 @@ class FlappyBird : ApplicationAdapter() {
                     Gdx.graphics.height / 2 + gap / 2 + tubeOffset[i]!!)
             batch!!.draw(bottomTube, tubeX[i]!!.toFloat(),
                     Gdx.graphics.height / 2 - gap / 2 - bottomTube!!.height + tubeOffset[i]!!)
+
+            topTubeRect[i] = Rectangle(tubeX[i]!!, Gdx.graphics.height / 2 + gap / 2 + tubeOffset[i]!!
+                    , topTube!!.width.toFloat(), topTube!!.height.toFloat())
+            bottomTubeRect[i] = Rectangle(tubeX[i]!!,
+                    Gdx.graphics.height / 2 - gap / 2 - bottomTube!!.height + tubeOffset[i]!!,
+                    bottomTube!!.width.toFloat(), bottomTube!!.height.toFloat())
             }
 
             if (birdY > 0 || velocity < 0) {
@@ -92,6 +113,26 @@ class FlappyBird : ApplicationAdapter() {
 
         batch!!.draw(birds[flapState], Gdx.graphics.width.toFloat() / 2 - birds[flapState]!!.width / 2, birdY)
         batch!!.end()
+
+        birdPeri!!.set(Gdx.graphics.width / 2f, birdY + birds[flapState]!!.height / 2, birds[flapState]!!.width / 2f)
+
+//        shapeRenderer!!.begin(ShapeRenderer.ShapeType.Filled)
+//        shapeRenderer!!.setColor(Color.RED)
+//        shapeRenderer!!.circle(birdPeri!!.x, birdPeri!!.y, birdPeri!!.radius)
+
+        for (i in 0 until numberOfTube) {
+//            shapeRenderer!!.rect(tubeX[i]!!, Gdx.graphics.height / 2 + gap / 2 + tubeOffset[i]!!
+//                    , topTube!!.width.toFloat(), topTube!!.height.toFloat())
+//            shapeRenderer!!.rect(tubeX[i]!!,
+//                    Gdx.graphics.height / 2 - gap / 2 - bottomTube!!.height + tubeOffset[i]!!,
+//                    bottomTube!!.width.toFloat(), bottomTube!!.height.toFloat())
+
+            if (Intersector.overlaps(birdPeri, topTubeRect[i]) || Intersector.overlaps(birdPeri, bottomTubeRect[i])) {
+
+            }
+        }
+
+//        shapeRenderer!!.end()
     }
 
 }
