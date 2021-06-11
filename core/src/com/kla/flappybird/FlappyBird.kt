@@ -11,58 +11,56 @@ import com.badlogic.gdx.math.Intersector
 import com.badlogic.gdx.math.Rectangle
 import java.util.*
 
+
 class FlappyBird : ApplicationAdapter() {
-    var batch: SpriteBatch? = null
-    var background: Texture? = null
-//    var shapeRenderer: ShapeRenderer? = null
-
-    var gameover: Texture? = null
-
-    var birds = arrayOfNulls<Texture?>(2)
-    var flapState = 0
-    var birdY = 0f
-    var velocity = 0
-    var birdPeri: Circle? = null
-    var score = 0
-    var scoringTube = 0
-    var font: BitmapFont? = null
-
-    var gameState = 0
-    var gravity = 2
-
-    var topTube: Texture? = null
-    var bottomTube: Texture? = null
-    var gap = 500f
-    var maxTubeOffset = 0f
+    private var batch: SpriteBatch? = null
+    private var background: Texture? = null
+    private var gameover: Texture? = null
+    private var gameState = 0
     private val random = Random()
-    var tubeVelocity = 4f
-    private val numberOfTube = 4
-    var tubeX = arrayOfNulls<Float>(numberOfTube)
-    var tubeOffset = arrayOfNulls<Float>(numberOfTube)
-    var distanceBetweenTubes = 0
-    var topTubeRect = arrayOfNulls<Rectangle>(numberOfTube)
-    var bottomTubeRect = arrayOfNulls<Rectangle>(numberOfTube)
 
+    private var birds = arrayOfNulls<Texture?>(2)
+    private var birdPeri: Circle? = null
+    private var birdY = 0f
+    private var flapState = 0
+
+    private var score = 0
+    private var scoringTube = 0
+    private var font: BitmapFont? = null
+
+    private var velocity = 0
+    private var gravity = 2
+
+    private var topTube: Texture? = null
+    private var bottomTube: Texture? = null
+
+    private val numberOfTube = 4
+    private var tubeVelocity = 4f
+    private var distanceBetweenTubes = 0
+    private var gap = 550f
+    private var maxTubeOffset = 0f
+    private var tubeX = arrayOfNulls<Float>(numberOfTube)
+    private var tubeOffset = arrayOfNulls<Float>(numberOfTube)
+    private var topTubeRect = arrayOfNulls<Rectangle>(numberOfTube)
+    private var bottomTubeRect = arrayOfNulls<Rectangle>(numberOfTube)
 
     override fun create() {
         batch = SpriteBatch()
         background = Texture("bg.png")
         gameover = Texture("gameover.png")
-//        shapeRenderer = ShapeRenderer()
-        birdPeri = Circle()
-        font = BitmapFont()
-        font?.color = Color.WHITE
-        font?.data?.scale(10f)
 
-//        birds = arrayOfNulls<Texture>(2)
         birds[0] = Texture("bird.png")
         birds[1] = Texture("bird2.png")
-
+        birdPeri = Circle()
 
         topTube = Texture("toptube.png")
         bottomTube = Texture("bottomtube.png")
-        maxTubeOffset = Gdx.graphics.height / 2 - gap
-        distanceBetweenTubes = Gdx.graphics.width * 3 / 5
+        maxTubeOffset = Gdx.graphics.height / 2 - gap - 220
+        distanceBetweenTubes = Gdx.graphics.width * 4 / 6
+
+        font = BitmapFont()
+        font!!.color = Color.WHITE
+        font!!.data?.scale(10f)
 
         startGame()
     }
@@ -71,7 +69,7 @@ class FlappyBird : ApplicationAdapter() {
         birdY = Gdx.graphics.height.toFloat() / 2 - birds[0]!!.height / 2
 
         for (i in 0 until numberOfTube) {
-            tubeOffset[i] = (random.nextFloat() - 0.5f) * (Gdx.graphics.height - gap - 200)
+            tubeOffset[i] = (random.nextFloat() - 0.5f) * maxTubeOffset
             tubeX[i] = Gdx.graphics.width / 2 - topTube!!.width.toFloat() / 2 + Gdx.graphics.width + i * distanceBetweenTubes
             topTubeRect[i] = Rectangle()
             bottomTubeRect[i] = Rectangle()
@@ -103,11 +101,10 @@ class FlappyBird : ApplicationAdapter() {
             for (i in 0 until numberOfTube) {
                 if (tubeX[i]!! < -topTube!!.width) {
                     tubeX[i] = tubeX[i]!! + numberOfTube * distanceBetweenTubes
-                    tubeOffset[i] = (random.nextFloat() - 0.5f) * (Gdx.graphics.height - gap - 200)
+                    tubeOffset[i] = (random.nextFloat() - 0.5f) * maxTubeOffset
 
                 } else {
                     tubeX[i] = tubeX[i]!! - tubeVelocity
-
                 }
 
                 batch!!.draw(topTube, tubeX[i]!!.toFloat(),
@@ -150,12 +147,8 @@ class FlappyBird : ApplicationAdapter() {
 
 
             batch!!.draw(birds[flapState], Gdx.graphics.width.toFloat() / 2 - birds[flapState]!!.width / 2, birdY)
-            font?.draw(batch, score.toString(), 100f, 200f)
-
-
-
-
             birdPeri!!.set(Gdx.graphics.width / 2f, birdY + birds[flapState]!!.height / 2, birds[flapState]!!.width / 2f)
+        font?.draw(batch, score.toString(), 100f, 200f)
 
 //        shapeRenderer!!.begin(ShapeRenderer.ShapeType.Filled)
 //        shapeRenderer!!.setColor(Color.RED)
@@ -174,7 +167,6 @@ class FlappyBird : ApplicationAdapter() {
             }
             batch!!.end()
 //        shapeRenderer!!.end()
-
     }
 }
 
