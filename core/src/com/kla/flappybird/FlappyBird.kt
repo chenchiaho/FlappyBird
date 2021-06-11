@@ -4,8 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Circle
 import com.badlogic.gdx.math.Intersector
 import com.badlogic.gdx.math.Rectangle
@@ -21,6 +21,9 @@ class FlappyBird : ApplicationAdapter() {
     var birdY = 0f
     var velocity = 0
     var birdPeri: Circle? = null
+    var score = 0
+    var scoringTube = 0
+    var font: BitmapFont? = null
 
     var gameState = 0
     var gravity = 2
@@ -44,6 +47,9 @@ class FlappyBird : ApplicationAdapter() {
         background = Texture("bg.png")
 //        shapeRenderer = ShapeRenderer()
         birdPeri = Circle()
+        font = BitmapFont()
+        font?.color = Color.WHITE
+        font?.data?.scale(10f)
 
 //        birds = arrayOfNulls<Texture>(2)
         birds[0] = Texture("bird.png")
@@ -70,6 +76,16 @@ class FlappyBird : ApplicationAdapter() {
 
         if (gameState != 0) {
 
+            if (tubeX[scoringTube]!! < Gdx.graphics.width / 2) {
+                score++
+
+                if (scoringTube < numberOfTube - 1) {
+                    scoringTube++
+                } else {
+                    scoringTube = 0
+                }
+            }
+
             if (Gdx.input.justTouched()) {
                 velocity = -30
             }
@@ -81,6 +97,7 @@ class FlappyBird : ApplicationAdapter() {
 
                 } else {
                     tubeX[i] = tubeX[i]!! - tubeVelocity
+
                 }
 
             batch!!.draw(topTube, tubeX[i]!!.toFloat(),
@@ -88,8 +105,7 @@ class FlappyBird : ApplicationAdapter() {
             batch!!.draw(bottomTube, tubeX[i]!!.toFloat(),
                     Gdx.graphics.height / 2 - gap / 2 - bottomTube!!.height + tubeOffset[i]!!)
 
-            topTubeRect[i] = Rectangle(tubeX[i]!!, Gdx.graphics.height / 2 + gap / 2 + tubeOffset[i]!!
-                    , topTube!!.width.toFloat(), topTube!!.height.toFloat())
+            topTubeRect[i] = Rectangle(tubeX[i]!!, Gdx.graphics.height / 2 + gap / 2 + tubeOffset[i]!!, topTube!!.width.toFloat(), topTube!!.height.toFloat())
             bottomTubeRect[i] = Rectangle(tubeX[i]!!,
                     Gdx.graphics.height / 2 - gap / 2 - bottomTube!!.height + tubeOffset[i]!!,
                     bottomTube!!.width.toFloat(), bottomTube!!.height.toFloat())
@@ -112,6 +128,9 @@ class FlappyBird : ApplicationAdapter() {
 
 
         batch!!.draw(birds[flapState], Gdx.graphics.width.toFloat() / 2 - birds[flapState]!!.width / 2, birdY)
+        font?.draw(batch, score.toString(), 100f, 200f)
+
+
         batch!!.end()
 
         birdPeri!!.set(Gdx.graphics.width / 2f, birdY + birds[flapState]!!.height / 2, birds[flapState]!!.width / 2f)
